@@ -3,923 +3,436 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Penilaian Praktik Pengajaran Sains Dasar</title>
-    <!-- Tailwind CSS -->
+    <title>Aplikasi Penilaian Praktik Pengajaran Sains Dasar</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js for Radar Chart Visualization -->
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
+
+    <!-- Header / Navbar -->
+    <header class="bg-indigo-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <h1 class="text-2xl font-bold">Aplikasi Penilaian Praktik Pengajaran Sains Dasar</h1>
+            <p class="text-indigo-200 text-sm mt-1">Evaluasi 360-Derajat: Penilaian Diri, Teman Sejawat, dan Dosen</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 mt-6 space-y-6">
+
+        <!-- Top Controls: Sesi Praktik & Cetak -->
+        <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-md gap-4">
+            <!-- Navigasi Sesi Praktik -->
+            <div class="flex space-x-2 bg-slate-100 p-1.5 rounded-lg border border-slate-200">
+                <button id="btn-praktik1" onclick="setSession('praktik1')" class="px-5 py-2 text-sm font-semibold rounded-md transition-all bg-indigo-600 text-white shadow">
+                    Praktik 1
+                </button>
+                <button id="btn-praktik2" onclick="setSession('praktik2')" class="px-5 py-2 text-sm font-semibold rounded-md transition-all text-slate-600 hover:text-indigo-600">
+                    Praktik 2
+                </button>
+            </div>
+
+            <!-- Tombol Cetak / PDF -->
+            <button onclick="window.print()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg text-sm flex items-center justify-center gap-2 transition-all shadow">
+                <span>🖨️</span> Cetak Laporan / PDF
+            </button>
+        </div>
+
+        <!-- Section 1: Identitas Mahasiswa & Bahan Ajar -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Data Mahasiswa -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                <h2 class="text-lg font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2">
+                    <span>👤</span> Identitas Mahasiswa Praktikan
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Mahasiswa</label>
+                        <input type="text" id="input-nama" onchange="saveData()" placeholder="Nama Mahasiswa..." class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">NIM</label>
+                        <input type="text" id="input-nim" onchange="saveData()" placeholder="NIM..." class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Topik / Materi Pembelajaran Sains</label>
+                        <input type="text" id="input-topik" onchange="saveData()" placeholder="Contoh: Photosynthesis & Transport pada Tumbuhan" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Media / Bahan Ajar -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                <h2 class="text-lg font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2">
+                    <span>📁</span> Media & Bahan Ajar
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Upload Modul / PPT / RPP</label>
+                        <input type="file" id="input-file" onchange="handleFileUpload(event)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        <p id="file-info" class="text-xs text-emerald-600 font-medium mt-1"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Link Video Praktik (YouTube/Drive)</label>
+                        <input type="url" id="input-video-link" onchange="saveData()" placeholder="https://..." class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Tab Penilaian (3-Perspektif) & Rekapitulasi -->
+        <div class="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden">
+            <!-- Tab Navigasi Penilaian -->
+            <div class="flex flex-wrap border-b bg-slate-50">
+                <button id="tab-self" onclick="switchTab('self')" class="px-6 py-3 font-medium text-sm border-b-2 border-indigo-600 text-indigo-600 bg-white">
+                    1. Penilaian Diri (Self)
+                </button>
+                <button id="tab-peer" onclick="switchTab('peer')" class="px-6 py-3 font-medium text-sm border-b-2 border-transparent text-slate-500 hover:text-indigo-600">
+                    2. Teman Sejawat (Peer)
+                </button>
+                <button id="tab-lecturer" onclick="switchTab('lecturer')" class="px-6 py-3 font-medium text-sm border-b-2 border-transparent text-slate-500 hover:text-indigo-600">
+                    3. Penilaian Dosen
+                </button>
+                <button id="tab-recap" onclick="switchTab('recap')" class="px-6 py-3 font-medium text-sm border-b-2 border-transparent text-slate-500 hover:text-indigo-600 font-semibold text-emerald-700">
+                    4. Rekapitulasi & Grafik
+                </button>
+            </div>
+
+            <!-- Konten Form Penilaian (Self / Peer / Lecturer) -->
+            <div id="panel-form" class="p-6">
+                <div class="mb-4 bg-indigo-50 p-3 rounded-lg border border-indigo-100 text-xs text-indigo-800">
+                    <strong>Petunjuk Skala Nilai:</strong> 1 = Kurang | 2 = Cukup | 3 = Baik | 4 = Sangat Baik
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 border-b text-slate-700">
+                                <th class="p-3 w-12 text-center">No</th>
+                                <th class="p-3">Indikator Praktik Pengajaran Sains</th>
+                                <th class="p-3 text-center w-48">Skor (1 - 4)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rubrik-body">
+                            <!-- Diisi secara dinamis oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Catatan Umpan Balik -->
+                <div class="mt-6">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Catatan Kelebihan & Masukan Pengembangan</label>
+                    <textarea id="catatan-text" onchange="saveData()" rows="3" class="w-full p-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tuliskan umpan balik konstruktif di sini..."></textarea>
+                </div>
+            </div>
+
+            <!-- Panel Rekapitulasi & Grafik (Disembunyikan secara default) -->
+            <div id="panel-recap" class="p-6 hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <!-- Canvas Grafik Radar -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-center">
+                        <h3 class="text-sm font-bold text-slate-700 mb-2">Grafik Perbandingan Persepsi (Radar)</h3>
+                        <div class="w-full max-w-xs sm:max-w-md">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Ringkasan Skor -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-slate-800 border-b pb-2">Ringkasan Nilai Praktik</h3>
+                        
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                <div class="text-xs font-semibold text-blue-600">Diri (Self)</div>
+                                <div id="score-self" class="text-xl font-extrabold text-blue-800 mt-1">0.00</div>
+                            </div>
+                            <div class="bg-amber-50 p-3 rounded-lg border border-amber-100">
+                                <div class="text-xs font-semibold text-amber-600">Teman (Peer)</div>
+                                <div id="score-peer" class="text-xl font-extrabold text-amber-800 mt-1">0.00</div>
+                            </div>
+                            <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                                <div class="text-xs font-semibold text-indigo-600">Dosen</div>
+                                <div id="score-lecturer" class="text-xl font-extrabold text-indigo-800 mt-1">0.00</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 text-center">
+                            <div class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Nilai Akhir (Skor Dosen 60% + Peer 20% + Self 20%)</div>
+                            <div id="final-score" class="text-3xl font-black text-emerald-800 my-1">0.00</div>
+                            <div id="final-grade" class="inline-block px-3 py-1 bg-emerald-600 text-white font-bold rounded-full text-xs">Predikat: -</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- LOGIKA JAVASCRIPT LENGKAP -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        science: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0369a1',
-                            700: '#075985',
-                            800: '#07476f',
+        // Indikator Rubrik Sains
+        const rubrikData = [
+            "Apersepsi & Penjelasan Konsep Dasar Sains",
+            "Penerapan Metode Ilmiah / Scientific Approach",
+            "Penggunaan Alat Peraga & Media Sains",
+            "Manajemen Kelas & Pengelolaan Waktu Praktikum",
+            "Keterampilan Bertanya & Membimbing Diskusi",
+            "Penguasaan Pengoperasian Laboratorium / Keamanan Kerja",
+            "Evaluasi & Umpan Balik Ketercapaian Pembelajaran Sains"
+        ];
+
+        // State Aplikasi
+        let currentSession = 'praktik1'; // 'praktik1' | 'praktik2'
+        let currentTab = 'self';         // 'self' | 'peer' | 'lecturer' | 'recap'
+        let chartInstance = null;
+
+        // Struktur Data
+        let appData = {
+            praktik1: createEmptyData(),
+            praktik2: createEmptyData()
+        };
+
+        function createEmptyData() {
+            return {
+                nama: '',
+                nim: '',
+                topik: '',
+                fileName: '',
+                videoLink: '',
+                scores: {
+                    self: [0, 0, 0, 0, 0, 0, 0],
+                    peer: [0, 0, 0, 0, 0, 0, 0],
+                    lecturer: [0, 0, 0, 0, 0, 0, 0]
+                },
+                notes: { self: '', peer: '', lecturer: '' }
+            };
+        }
+
+        // Inisialisasi Aplikasi saat Load
+        window.onload = function() {
+            loadFromLocalStorage();
+            renderForm();
+            updateUI();
+        };
+
+        // Ganti Sesi Praktik 1 / Praktik 2
+        function setSession(session) {
+            currentSession = session;
+            
+            // Toggle warna tombol
+            document.getElementById('btn-praktik1').className = session === 'praktik1'
+                ? 'px-5 py-2 text-sm font-semibold rounded-md transition-all bg-indigo-600 text-white shadow'
+                : 'px-5 py-2 text-sm font-semibold rounded-md transition-all text-slate-600 hover:text-indigo-600';
+            
+            document.getElementById('btn-praktik2').className = session === 'praktik2'
+                ? 'px-5 py-2 text-sm font-semibold rounded-md transition-all bg-indigo-600 text-white shadow'
+                : 'px-5 py-2 text-sm font-semibold rounded-md transition-all text-slate-600 hover:text-indigo-600';
+
+            updateUI();
+            if (currentTab === 'recap') updateRecap();
+        }
+
+        // Ganti Tab Penilaian
+        function switchTab(tab) {
+            currentTab = tab;
+            const tabs = ['self', 'peer', 'lecturer', 'recap'];
+
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tab) {
+                    btn.className = "px-6 py-3 font-medium text-sm border-b-2 border-indigo-600 text-indigo-600 bg-white font-semibold";
+                } else {
+                    btn.className = "px-6 py-3 font-medium text-sm border-b-2 border-transparent text-slate-500 hover:text-indigo-600";
+                }
+            });
+
+            if (tab === 'recap') {
+                document.getElementById('panel-form').classList.add('hidden');
+                document.getElementById('panel-recap').classList.remove('hidden');
+                updateRecap();
+            } else {
+                document.getElementById('panel-form').classList.remove('hidden');
+                document.getElementById('panel-recap').classList.add('hidden');
+                renderForm();
+            }
+        }
+
+        // Render Tabel Form Rubrik
+        function renderForm() {
+            const tbody = document.getElementById('rubrik-body');
+            tbody.innerHTML = '';
+
+            const currentScores = appData[currentSession].scores[currentTab];
+
+            rubrikData.forEach((indikator, index) => {
+                const row = document.createElement('tr');
+                row.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
+
+                let optionsHTML = '<option value="0">-- Pilih --</option>';
+                [1, 2, 3, 4].forEach(val => {
+                    const selected = currentScores[index] === val ? 'selected' : '';
+                    optionsHTML += `<option value="${val}" ${selected}>${val}</option>`;
+                });
+
+                row.innerHTML = `
+                    <td class="p-3 text-center font-medium text-slate-500">${index + 1}</td>
+                    <td class="p-3 font-medium text-slate-800">${indikator}</td>
+                    <td class="p-3 text-center">
+                        <select onchange="updateScore(${index}, this.value)" class="w-full px-2 py-1.5 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                            ${optionsHTML}
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Set Catatan
+            document.getElementById('catatan-text').value = appData[currentSession].notes[currentTab] || '';
+        }
+
+        // Update Skor Per Indikator
+        function updateScore(index, val) {
+            appData[currentSession].scores[currentTab][index] = parseInt(val) || 0;
+            saveData();
+        }
+
+        // Simpan Data Identitas
+        function saveData() {
+            const data = appData[currentSession];
+            data.nama = document.getElementById('input-nama').value;
+            data.nim = document.getElementById('input-nim').value;
+            data.topik = document.getElementById('input-topik').value;
+            data.videoLink = document.getElementById('input-video-link').value;
+            
+            if (currentTab !== 'recap') {
+                data.notes[currentTab] = document.getElementById('catatan-text').value;
+            }
+
+            saveToLocalStorage();
+        }
+
+        // Handle File Upload Simpel
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                appData[currentSession].fileName = file.name;
+                document.getElementById('file-info').innerText = "✓ Tersimpan: " + file.name;
+                saveData();
+            }
+        }
+
+        // Update Seluruh Tampilan UI dengan Data Terbaru
+        function updateUI() {
+            const data = appData[currentSession];
+            document.getElementById('input-nama').value = data.nama || '';
+            document.getElementById('input-nim').value = data.nim || '';
+            document.getElementById('input-topik').value = data.topik || '';
+            document.getElementById('input-video-link').value = data.videoLink || '';
+            document.getElementById('file-info').innerText = data.fileName ? "✓ Tersimpan: " + data.fileName : '';
+
+            if (currentTab !== 'recap') {
+                renderForm();
+            }
+        }
+
+        // Hitung Rata-Rata Skor
+        function getAverage(arr) {
+            const sum = arr.reduce((a, b) => a + b, 0);
+            return arr.length ? (sum / arr.length) : 0;
+        }
+
+        // Hitung Rekapitulasi & Render Grafik
+        function updateRecap() {
+            const scores = appData[currentSession].scores;
+            
+            const avgSelf = getAverage(scores.self);
+            const avgPeer = getAverage(scores.peer);
+            const avgLecturer = getAverage(scores.lecturer);
+
+            document.getElementById('score-self').innerText = avgSelf.toFixed(2);
+            document.getElementById('score-peer').innerText = avgPeer.toFixed(2);
+            document.getElementById('score-lecturer').innerText = avgLecturer.toFixed(2);
+
+            // Pembobotan: Dosen 60%, Peer 20%, Self 20%
+            const finalScore = (avgLecturer * 0.6) + (avgPeer * 0.2) + (avgSelf * 0.2);
+            document.getElementById('final-score').innerText = finalScore.toFixed(2);
+
+            // Predikat
+            let grade = 'E';
+            if (finalScore >= 3.5) grade = 'A (Sangat Baik)';
+            else if (finalScore >= 3.0) grade = 'B (Baik)';
+            else if (finalScore >= 2.0) grade = 'C (Cukup)';
+            else if (finalScore >= 1.0) grade = 'D (Kurang)';
+            
+            document.getElementById('final-grade').innerText = 'Predikat: ' + grade;
+
+            // Render Chart.js
+            renderRadarChart(scores.self, scores.peer, scores.lecturer);
+        }
+
+        // Render / Refresh Radar Chart
+        function renderRadarChart(self, peer, lecturer) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: rubrikData.map((_, i) => `Indikator ${i+1}`),
+                    datasets: [
+                        {
+                            label: 'Diri (Self)',
+                            data: self,
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        },
+                        {
+                            label: 'Teman (Peer)',
+                            data: peer,
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                        },
+                        {
+                            label: 'Dosen',
+                            data: lecturer,
+                            borderColor: 'rgba(79, 70, 229, 1)',
+                            backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 4,
+                            ticks: { stepSize: 1 }
                         }
                     }
+                }
+            });
+        }
+
+        // Penyimpanan di LocalStorage Browser
+        function saveToLocalStorage() {
+            localStorage.setItem('sains_penilaian_data', JSON.stringify(appData));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('sains_penilaian_data');
+            if (saved) {
+                try {
+                    appData = JSON.parse(saved);
+                } catch (e) {
+                    console.error("Gagal memuat data tersimpan", e);
                 }
             }
         }
     </script>
-    <style>
-        @media print {
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            body { background: white !important; font-size: 12pt; }
-            .shadow-xl, .shadow-md, .shadow-sm { box-shadow: none !important; }
-            .border { border-color: #cbd5e1 !important; }
-        }
-        .print-only { display: none; }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
 
-    <!-- Header / Navbar -->
-    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50 no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-science-500 p-2 rounded-lg text-white">
-                        <i class="fa-solid fa-flask-vial text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-lg leading-tight">SiPenilai Sains</h1>
-                        <p class="text-xs text-slate-400">Praktik Pengajaran Sains Dasar</p>
-                    </div>
-                </div>
-                <!-- Session Selector Pills -->
-                <div class="flex items-center space-x-2 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
-                    <button id="btn-praktik-1" onclick="switchPractice('P1')" class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 bg-science-600 text-white shadow">
-                        <i class="fa-solid fa-1 mr-1"></i> Praktik 1
-                    </button>
-                    <button id="btn-praktik-2" onclick="switchPractice('P2')" class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-300 hover:text-white">
-                        <i class="fa-solid fa-2 mr-1"></i> Praktik 2
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Container -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-
-        <!-- Student Info Header Card -->
-        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 transition-all">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                <div class="flex items-center space-x-3">
-                    <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-science-100 text-science-700 font-bold" id="session-badge">
-                        P1
-                    </span>
-                    <div>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-science-600" id="current-session-label">Sesi Praktik 1</span>
-                        <h2 class="text-xl font-bold text-slate-800" id="display-judul">Sains Dasar: Hukum Newton & Pembelajarannya</h2>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-2 no-print">
-                    <button onclick="toggleEditStudentModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-pen-to-square"></i> Ubah Identitas
-                    </button>
-                    <button onclick="window.print()" class="text-xs bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-print"></i> Cetak Laporan
-                    </button>
-                </div>
-            </div>
-
-            <!-- Student Metadata Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
-                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <span class="text-xs text-slate-500 block">Nama Mahasiswa</span>
-                    <span class="font-semibold text-slate-800" id="display-nama">Ahmad Rizky</span>
-                </div>
-                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <span class="text-xs text-slate-500 block">NIM</span>
-                    <span class="font-semibold text-slate-800" id="display-nim">2101050023</span>
-                </div>
-                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <span class="text-xs text-slate-500 block">Kelas / Rombel</span>
-                    <span class="font-semibold text-slate-800" id="display-kelas">Praktik Pengajaran Sains Dasae - A</span>
-                </div>
-                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <span class="text-xs text-slate-500 block">Dosen Pengampu</span>
-                    <span class="font-semibold text-slate-800" id="display-dosen">Puspo Rohmi, M.Pd.</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Media / Teaching Material Upload Section -->
-        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-folder-open text-science-600"></i> Media & Bahan Ajar Praktikum
-                    </h3>
-                    <p class="text-xs text-slate-500">Unggah RPP, Slide PPT, Lembar Kerja (LKPD), atau Tautan Video Pembelajaran untuk <span class="font-medium text-slate-700" id="upload-session-text">Praktik 1</span></p>
-                </div>
-                <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-medium" id="media-count-badge">
-                    0 File Diunggah
-                </span>
-            </div>
-
-            <!-- Drag and Drop Box & Link Input Container -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 no-print">
-                <!-- Dropzone -->
-                <div class="lg:col-span-2 border-2 border-dashed border-slate-300 hover:border-science-500 rounded-xl p-4 text-center transition cursor-pointer bg-slate-50/50 hover:bg-science-50/30 flex flex-col items-center justify-center space-y-2 relative" id="drop-zone">
-                    <input type="file" id="file-input" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" multiple onchange="handleFileUpload(event)">
-                    <div class="w-10 h-10 rounded-full bg-science-100 text-science-600 flex items-center justify-center">
-                        <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-slate-700">Tarik & lepas berkas di sini, atau <span class="text-science-600 underline">Cari File</span></p>
-                        <p class="text-xs text-slate-400 mt-0.5">Mendukung PDF, PPTX, DOCX, PNG/JPG (Maks 10MB per file)</p>
-                    </div>
-                </div>
-
-                <!-- URL Media Input -->
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col justify-between space-y-3">
-                    <label class="block text-xs font-semibold text-slate-700">Tambah Tautan / Video Praktikum</label>
-                    <div class="space-y-2">
-                        <input type="text" id="media-title-input" placeholder="Nama Bahan / Video (mis: Video Demonstrasi)" class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-science-500 outline-none">
-                        <input type="url" id="media-url-input" placeholder="https://youtube.com/... atau Drive" class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-science-500 outline-none">
-                    </div>
-                    <button onclick="addUrlMedia()" class="w-full bg-science-600 hover:bg-science-700 text-white text-xs font-semibold py-2 rounded-lg transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-link"></i> Tambahkan Tautan
-                    </button>
-                </div>
-            </div>
-
-            <!-- Uploaded Files List Table -->
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
-                        <tr>
-                            <th class="py-2.5 px-3">Tipe</th>
-                            <th class="py-2.5 px-3">Nama File / Media</th>
-                            <th class="py-2.5 px-3">Ukuran / Sumber</th>
-                            <th class="py-2.5 px-3">Tanggal Unggah</th>
-                            <th class="py-2.5 px-3 text-right no-print">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="media-list-table" class="divide-y divide-slate-100 text-slate-700">
-                        <!-- Dynamic Upload Rows inserted here -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Evaluation Rubric Tabs Section -->
-        <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
-            <!-- Tabs Navigation -->
-            <div class="bg-slate-100/80 p-2 border-b border-slate-200 flex flex-wrap gap-2 no-print">
-                <button id="tab-btn-self" onclick="switchEvalTab('self')" class="flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-white text-science-700 shadow-sm border border-slate-200">
-                    <i class="fa-solid fa-user-gear"></i> Penilaian Diri (Self)
-                </button>
-                <button id="tab-btn-peer" onclick="switchEvalTab('peer')" class="flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-200/60">
-                    <i class="fa-solid fa-users"></i> Teman Sejawat (Peer)
-                </button>
-                <button id="tab-btn-dosen" onclick="switchEvalTab('dosen')" class="flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-200/60">
-                    <i class="fa-solid fa-graduation-cap"></i> Penilaian Dosen
-                </button>
-            </div>
-
-            <!-- Tab Content Form Container -->
-            <div class="p-5">
-                <!-- Header Info for Evaluation Role -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
-                    <div>
-                        <h4 class="text-base font-bold text-slate-800 flex items-center gap-2" id="eval-role-title">
-                            <i class="fa-solid fa-user text-science-600"></i> Form Refleksi Penilaian Diri Sendiri
-                        </h4>
-                        <p class="text-xs text-slate-500" id="eval-role-desc">Isilah evaluasi mandiri sejujurnya terkait persiapan dan keterlaksanaan praktik pengajaran sains Anda.</p>
-                    </div>
-
-                    <!-- Peer Name Selector (Only Active in Peer Tab) -->
-                    <div id="peer-evaluator-box" class="hidden flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 no-print">
-                        <label class="text-xs font-medium text-slate-600 whitespace-nowrap">Nama Penilai:</label>
-                        <input type="text" id="peer-evaluator-name" placeholder="Nama Teman Sejawat" oninput="saveCurrentFormState()" class="text-xs p-1.5 rounded border border-slate-300 focus:ring-1 focus:ring-science-500 outline-none">
-                    </div>
-                </div>
-
-                <!-- Rubric Criteria Items Container -->
-                <form id="rubric-form" onsubmit="event.preventDefault();" class="space-y-6">
-                    <!-- Criteria list populated by JS -->
-                    <div id="rubric-items-container" class="space-y-5">
-                        <!-- Dynamic Rubric Items Render Here -->
-                    </div>
-
-                    <!-- Notes / Feedback Section -->
-                    <div class="pt-4 border-t border-slate-100 space-y-2">
-                        <label class="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                            <i class="fa-solid fa-comment-dots text-science-600"></i> Catatan Refleksi / Masukan & Saran Pembelajaran Sains
-                        </label>
-                        <textarea id="eval-notes" rows="3" oninput="saveCurrentFormState()" placeholder="Tuliskan saran perbaikan, kendala eksperimen sains dasar, atau penguatan..." class="w-full text-xs p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-science-500 outline-none"></textarea>
-                    </div>
-
-                    <!-- Auto-Calculation Live Indicator -->
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-4 no-print">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-science-600 text-white flex items-center justify-center font-bold text-sm" id="live-score-val">
-                                0.0
-                            </div>
-                            <div>
-                                <span class="text-xs text-slate-500 block">Rata-rata Skor Tab Ini</span>
-                                <span class="text-xs font-bold text-slate-700" id="live-predikat-text">Belum Terisi</span>
-                            </div>
-                        </div>
-                        <button type="button" onclick="resetCurrentTabForm()" class="text-xs text-rose-600 hover:text-rose-800 font-medium px-3 py-1.5 rounded-lg border border-rose-200 hover:bg-rose-50 transition">
-                            <i class="fa-solid fa-rotate-left mr-1"></i> Reset Nilai Form Ini
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </section>
-
-        <!-- Recapitulation & Comparison Report Section -->
-        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
-                <div>
-                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-pie text-science-600"></i> Rekapitulasi & Comparison Laporan Penilaian
-                    </h3>
-                    <p class="text-xs text-slate-500">Hasil komparasi trianggulasi penilaian Diri (Self), Peer, dan Dosen untuk Praktik 1 & 2</p>
-                </div>
-            </div>
-
-            <!-- Visualization and Summary Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-                <!-- Radar Chart Container -->
-                <div class="lg:col-span-1 bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-center">
-                    <span class="text-xs font-bold text-slate-700 mb-2">Profil Kompetensi Sains (Sesi Aktif)</span>
-                    <div class="w-full max-w-[280px] h-[260px] relative">
-                        <canvas id="radarChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Final Score Summary Cards -->
-                <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <!-- Self Assessment Final Card -->
-                    <div class="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-200/60 flex flex-col justify-between space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-semibold text-blue-800">Penilaian Diri</span>
-                            <i class="fa-solid fa-user text-blue-500 text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="text-2xl font-extrabold text-blue-900" id="rekap-score-self">0.00</div>
-                            <span class="text-[10px] font-semibold text-blue-700 uppercase" id="rekap-predikat-self">-</span>
-                        </div>
-                        <div class="w-full bg-blue-200/60 h-1.5 rounded-full overflow-hidden">
-                            <div id="bar-self" class="bg-blue-600 h-full w-0 transition-all duration-500"></div>
-                        </div>
-                    </div>
-
-                    <!-- Peer Assessment Final Card -->
-                    <div class="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-200/60 flex flex-col justify-between space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-semibold text-emerald-800">Teman Sejawat</span>
-                            <i class="fa-solid fa-users text-emerald-500 text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="text-2xl font-extrabold text-emerald-900" id="rekap-score-peer">0.00</div>
-                            <span class="text-[10px] font-semibold text-emerald-700 uppercase" id="rekap-predikat-peer">-</span>
-                        </div>
-                        <div class="w-full bg-emerald-200/60 h-1.5 rounded-full overflow-hidden">
-                            <div id="bar-peer" class="bg-emerald-600 h-full w-0 transition-all duration-500"></div>
-                        </div>
-                    </div>
-
-                    <!-- Lecturer Assessment Final Card -->
-                    <div class="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-fuchsia-50/50 border border-purple-200/60 flex flex-col justify-between space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-semibold text-purple-800">Penilaian Dosen</span>
-                            <i class="fa-solid fa-graduation-cap text-purple-500 text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="text-2xl font-extrabold text-purple-900" id="rekap-score-dosen">0.00</div>
-                            <span class="text-[10px] font-semibold text-purple-700 uppercase" id="rekap-predikat-dosen">-</span>
-                        </div>
-                        <div class="w-full bg-purple-200/60 h-1.5 rounded-full overflow-hidden">
-                            <div id="bar-dosen" class="bg-purple-600 h-full w-0 transition-all duration-500"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Comprehensive Summary Table for Both Practice Sessions -->
-            <div class="overflow-x-auto pt-2">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                        <tr class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-300">
-                            <th class="py-3 px-3">Komponen Rubrik Sains Dasar</th>
-                            <th class="py-3 px-2 text-center bg-blue-50/50 border-x border-slate-200" colspan="3">Praktik 1 (P1)</th>
-                            <th class="py-3 px-2 text-center bg-purple-50/50 border-x border-slate-200" colspan="3">Praktik 2 (P2)</th>
-                        </tr>
-                        <tr class="bg-slate-50 text-slate-600 border-b border-slate-200 text-[11px]">
-                            <th class="py-2 px-3">Indikator</th>
-                            <th class="py-2 px-2 text-center bg-blue-50/30">Self</th>
-                            <th class="py-2 px-2 text-center bg-blue-50/30">Peer</th>
-                            <th class="py-2 px-2 text-center bg-blue-50/30 font-bold text-science-700">Dosen</th>
-                            <th class="py-2 px-2 text-center bg-purple-50/30">Self</th>
-                            <th class="py-2 px-2 text-center bg-purple-50/30">Peer</th>
-                            <th class="py-2 px-2 text-center bg-purple-50/30 font-bold text-purple-700">Dosen</th>
-                        </tr>
-                    </thead>
-                    <tbody id="comparison-table-body" class="divide-y divide-slate-200 text-slate-700">
-                        <!-- Comparative Table Rows inserted via JS -->
-                    </tbody>
-                    <tfoot class="bg-slate-100 font-bold text-slate-800 border-t-2 border-slate-300">
-                        <tr>
-                            <td class="py-3 px-3">NILAI AKHIR RATA-RATA</td>
-                            <td class="py-3 px-2 text-center" id="foot-p1-self">0.0</td>
-                            <td class="py-3 px-2 text-center" id="foot-p1-peer">0.0</td>
-                            <td class="py-3 px-2 text-center text-science-700" id="foot-p1-dosen">0.0</td>
-                            <td class="py-3 px-2 text-center" id="foot-p2-self">0.0</td>
-                            <td class="py-3 px-2 text-center" id="foot-p2-peer">0.0</td>
-                            <td class="py-3 px-2 text-center text-purple-700" id="foot-p2-dosen">0.0</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </section>
-    </main>
-
-    <!-- Modal: Edit Student Profile -->
-    <div id="modal-edit-student" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-base text-slate-800">Edit Identitas Mahasiswa</h3>
-                <button onclick="toggleEditStudentModal()" class="text-slate-400 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block font-medium text-slate-700 mb-1">Nama Mahasiswa</label>
-                    <input type="text" id="input-nama" class="w-full p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-science-500 outline-none">
-                </div>
-                <div>
-                    <label class="block font-medium text-slate-700 mb-1">NIM</label>
-                    <input type="text" id="input-nim" class="w-full p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-science-500 outline-none">
-                </div>
-                <div>
-                    <label class="block font-medium text-slate-700 mb-1">Kelas / Rombel</label>
-                    <input type="text" id="input-kelas" class="w-full p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-science-500 outline-none">
-                </div>
-                <div>
-                    <label class="block font-medium text-slate-700 mb-1">Judul Materi Sains Dasar</label>
-                    <input type="text" id="input-judul" class="w-full p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-science-500 outline-none">
-                </div>
-                <div>
-                    <label class="block font-medium text-slate-700 mb-1">Dosen Pengampu</label>
-                    <input type="text" id="input-dosen" class="w-full p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-science-500 outline-none">
-                </div>
-            </div>
-            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-100">
-                <button onclick="toggleEditStudentModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
-                <button onclick="saveStudentProfile()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-science-600 hover:bg-science-700 text-white shadow">Simpan Identitas</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        /*
-         * APP STATE & DATA STRUCTURES
-         */
-        const RUBRIC_CRITERIA = [
-            {
-                id: 'k1',
-                title: '1. Keterampilan Pembukaan & Apersepsi Konsep Sains',
-                desc: 'Menarik perhatian siswa, mengaitkan pengetahuan awal dengan fenomena sains kontekstual sehari-hari, dan menyampaikan tujuan pembelajaran.'
-            },
-            {
-                id: 'k2',
-                title: '2. Penguasaan Materi Sains & Keterampilan Proses',
-                desc: 'Kebenaran konsep sains dasar, ketepatan prosedur eksperimen/demonstrasi lab, mitigasi miskonsepsi, serta bimbingan observasi.'
-            },
-            {
-                id: 'k3',
-                title: '3. Penggunaan Media / Bahan Ajar / Alat Praktikum',
-                desc: 'Efektivitas penggunaan KIT sains/alat peraga, kejelasan Lembar Kerja Siswa (LKS/LKPD), serta kemudahan dipahami siswa.'
-            },
-            {
-                id: 'k4',
-                title: '4. Pengelolaan Kelas & Interaksi Siswa',
-                desc: 'Mendorong rasa ingin tahu (inquiry), bertanya kritis, pengelolaan kelompok eksperimen, dan manajemen waktu pembelajaran.'
-            },
-            {
-                id: 'k5',
-                title: '5. Penutup & Evaluasi Pembelajaran Sains',
-                desc: 'Membimbing siswa menyimpulkan hasil praktikum/pembelajaran, melakukan evaluasi pemahaman sains, dan refleksi.'
-            }
-        ];
-
-        // Default Data Model Structure
-        let appState = {
-            activePractice: 'P1', // 'P1' or 'P2'
-            activeTab: 'self',   // 'self', 'peer', 'dosen'
-            student: {
-                nama: 'Ahmad Rizky',
-                nim: '2101050023',
-                kelas: 'Pendidikan IPA - A',
-                judul: 'Sains Dasar: Hukum Newton & Pembelajarannya',
-                dosen: 'Dr. Maya Indah, M.Pd.'
-            },
-            media: {
-                P1: [
-                    { id: 1, name: 'RPP_Sains_Dasar_P1.pdf', size: '1.2 MB', type: 'PDF', date: '2026-09-20' },
-                    { id: 2, name: 'Slide_Presentasi_Hukum_Newton.pptx', size: '4.5 MB', type: 'PPT', date: '2026-09-21' }
-                ],
-                P2: []
-            },
-            evaluations: {
-                P1: {
-                    self: { scores: { k1: 4, k2: 4, k3: 5, k4: 4, k5: 3 }, notes: 'Masih perlu memantapkan manajemen waktu saat eksperimen.', peerName: '' },
-                    peer: { scores: { k1: 4, k2: 5, k3: 4, k4: 4, k5: 4 }, notes: 'Eksperimen menarik dan siswa aktif terlibat.', peerName: 'Siti Sarah' },
-                    dosen: { scores: { k1: 4, k2: 4, k3: 5, k4: 5, k5: 4 }, notes: 'Apersepsi fenomena sains sangat baik. Pertahankan!', peerName: '' }
-                },
-                P2: {
-                    self: { scores: { k1: 0, k2: 0, k3: 0, k4: 0, k5: 0 }, notes: '', peerName: '' },
-                    peer: { scores: { k1: 0, k2: 0, k3: 0, k4: 0, k5: 0 }, notes: '', peerName: '' },
-                    dosen: { scores: { k1: 0, k2: 0, k3: 0, k4: 0, k5: 0 }, notes: '', peerName: '' }
-                }
-            }
-        };
-
-        let radarChartInstance = null;
-
-        window.onload = function() {
-            loadFromLocalStorage();
-            renderStudentInfo();
-            renderMediaList();
-            renderRubricForm();
-            renderComparisonTable();
-            initRadarChart();
-            updateAllSummaries();
-        };
-
-        /*
-         * LOCAL STORAGE HANDLING
-         */
-        function saveToLocalStorage() {
-            try {
-                localStorage.setItem('sipenilai_sains_data', JSON.stringify(appState));
-            } catch (e) {
-                console.error("Local Storage Error", e);
-            }
-        }
-
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('sipenilai_sains_data');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    appState = { ...appState, ...parsed };
-                } catch (e) {
-                    console.error("Failed to parse localStorage data", e);
-                }
-            }
-        }
-
-        function switchPractice(session) {
-            appState.activePractice = session;
-            
-            // Toggle Button Styles
-            const b1 = document.getElementById('btn-praktik-1');
-            const b2 = document.getElementById('btn-praktik-2');
-            
-            if (session === 'P1') {
-                b1.className = "px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 bg-science-600 text-white shadow";
-                b2.className = "px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-300 hover:text-white";
-            } else {
-                b2.className = "px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 bg-science-600 text-white shadow";
-                b1.className = "px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-300 hover:text-white";
-            }
-
-            document.getElementById('session-badge').innerText = session;
-            document.getElementById('current-session-label').innerText = `Sesi Praktik ${session === 'P1' ? '1' : '2'}`;
-            document.getElementById('upload-session-text').innerText = `Praktik ${session === 'P1' ? '1' : '2'}`;
-
-            renderMediaList();
-            renderRubricForm();
-            updateRadarChart();
-            saveToLocalStorage();
-        }
-
-        function switchEvalTab(role) {
-            appState.activeTab = role;
-
-            const tabs = ['self', 'peer', 'dosen'];
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab-btn-${t}`);
-                if (t === role) {
-                    btn.className = "flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-white text-science-700 shadow-sm border border-slate-200";
-                } else {
-                    btn.className = "flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-200/60";
-                }
-            });
-
-            // Update Tab Titles
-            const titleEl = document.getElementById('eval-role-title');
-            const descEl = document.getElementById('eval-role-desc');
-            const peerBox = document.getElementById('peer-evaluator-box');
-
-            if (role === 'self') {
-                titleEl.innerHTML = `<i class="fa-solid fa-user text-science-600"></i> Form Refleksi Penilaian Diri Sendiri`;
-                descEl.innerText = "Isilah evaluasi mandiri sejujurnya terkait persiapan dan keterlaksanaan praktik pengajaran sains Anda.";
-                peerBox.classList.add('hidden');
-            } else if (role === 'peer') {
-                titleEl.innerHTML = `<i class="fa-solid fa-users text-emerald-600"></i> Form Penilaian Teman Sejawat (Peer-Review)`;
-                descEl.innerText = "Berikan penilaian objektif terhadap penampilan simulasi praktik pembelajaran rekan Anda.";
-                peerBox.classList.remove('hidden');
-            } else {
-                titleEl.innerHTML = `<i class="fa-solid fa-graduation-cap text-purple-600"></i> Form Penilaian Dosen Pengampu`;
-                descEl.innerText = "Penilaian resmi dan masukan konstruktif dari Dosen untuk penguatan kompetensi pedogogik sains.";
-                peerBox.classList.add('hidden');
-            }
-
-            renderRubricForm();
-        }
-
-        function renderStudentInfo() {
-            document.getElementById('display-nama').innerText = appState.student.nama;
-            document.getElementById('display-nim').innerText = appState.student.nim;
-            document.getElementById('display-kelas').innerText = appState.student.kelas;
-            document.getElementById('display-judul').innerText = appState.student.judul;
-            document.getElementById('display-dosen').innerText = appState.student.dosen;
-        }
-
-        function toggleEditStudentModal() {
-            const modal = document.getElementById('modal-edit-student');
-            if (modal.classList.contains('hidden')) {
-                document.getElementById('input-nama').value = appState.student.nama;
-                document.getElementById('input-nim').value = appState.student.nim;
-                document.getElementById('input-kelas').value = appState.student.kelas;
-                document.getElementById('input-judul').value = appState.student.judul;
-                document.getElementById('input-dosen').value = appState.student.dosen;
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-        function saveStudentProfile() {
-            appState.student.nama = document.getElementById('input-nama').value || 'Nama Mahasiswa';
-            appState.student.nim = document.getElementById('input-nim').value || '-';
-            appState.student.kelas = document.getElementById('input-kelas').value || '-';
-            appState.student.judul = document.getElementById('input-judul').value || 'Judul Materi Praktikum Sains';
-            appState.student.dosen = document.getElementById('input-dosen').value || 'Dosen Pengampu';
-
-            renderStudentInfo();
-            toggleEditStudentModal();
-            saveToLocalStorage();
-        }
-
-        function renderMediaList() {
-            const tableBody = document.getElementById('media-list-table');
-            const currentList = appState.media[appState.activePractice] || [];
-            document.getElementById('media-count-badge').innerText = `${currentList.length} File Diunggah`;
-
-            if (currentList.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="py-6 text-center text-slate-400 italic">
-                            Belum ada media atau bahan ajar yang diunggah untuk Praktik ${appState.activePractice === 'P1' ? '1' : '2'}.
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tableBody.innerHTML = currentList.map((item) => {
-                let iconClass = 'fa-file-pdf text-rose-500';
-                if (item.type === 'PPT') iconClass = 'fa-file-powerpoint text-orange-500';
-                if (item.type === 'LINK') iconClass = 'fa-link text-blue-500';
-                if (item.type === 'DOC') iconClass = 'fa-file-word text-blue-600';
-
-                return `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="py-2.5 px-3">
-                            <i class="fa-solid ${iconClass} text-base"></i>
-                        </td>
-                        <td class="py-2.5 px-3 font-medium text-slate-800">${escapeHtml(item.name)}</td>
-                        <td class="py-2.5 px-3 text-slate-500">${item.size}</td>
-                        <td class="py-2.5 px-3 text-slate-400">${item.date}</td>
-                        <td class="py-2.5 px-3 text-right space-x-2 no-print">
-                            <a href="#" onclick="alert('Simulasi Preview/Unduh File: ${escapeHtml(item.name)}'); return false;" class="text-science-600 hover:text-science-800 font-semibold text-xs">
-                                <i class="fa-solid fa-eye mr-0.5"></i> Lihat
-                            </a>
-                            <button onclick="deleteMedia(${item.id})" class="text-rose-500 hover:text-rose-700 text-xs">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function handleFileUpload(e) {
-            const files = e.target.files;
-            if (!files.length) return;
-
-            const today = new Date().toISOString().split('T')[0];
-
-            Array.from(files).forEach(file => {
-                let type = 'DOC';
-                if (file.name.endsWith('.pdf')) type = 'PDF';
-                if (file.name.endsWith('.ppt') || file.name.endsWith('.pptx')) type = 'PPT';
-
-                const newMedia = {
-                    id: Date.now() + Math.random(),
-                    name: file.name,
-                    size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
-                    type: type,
-                    date: today
-                };
-
-                appState.media[appState.activePractice].push(newMedia);
-            });
-
-            renderMediaList();
-            saveToLocalStorage();
-            e.target.value = '';
-        }
-
-        function addUrlMedia() {
-            const titleInput = document.getElementById('media-title-input');
-            const urlInput = document.getElementById('media-url-input');
-
-            const title = titleInput.value.trim();
-            const url = urlInput.value.trim();
-
-            if (!title || !url) {
-                alert('Harap isi nama bahan dan URL tautan!');
-                return;
-            }
-
-            const today = new Date().toISOString().split('T')[0];
-            const newMedia = {
-                id: Date.now(),
-                name: title,
-                size: 'URL Link',
-                type: 'LINK',
-                date: today
-            };
-
-            appState.media[appState.activePractice].push(newMedia);
-            titleInput.value = '';
-            urlInput.value = '';
-
-            renderMediaList();
-            saveToLocalStorage();
-        }
-
-        function deleteMedia(id) {
-            appState.media[appState.activePractice] = appState.media[appState.activePractice].filter(m => m.id !== id);
-            renderMediaList();
-            saveToLocalStorage();
-        }
-
-        function renderRubricForm() {
-            const container = document.getElementById('rubric-items-container');
-            const currentEval = appState.evaluations[appState.activePractice][appState.activeTab];
-
-            // Set Notes & Peer Evaluator Name
-            document.getElementById('eval-notes').value = currentEval.notes || '';
-            document.getElementById('peer-evaluator-name').value = currentEval.peerName || '';
-
-            container.innerHTML = RUBRIC_CRITERIA.map((criterion, idx) => {
-                const score = currentEval.scores[criterion.id] || 0;
-
-                return `
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition space-y-3">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <div>
-                                <h5 class="font-bold text-xs sm:text-sm text-slate-800">${criterion.title}</h5>
-                                <p class="text-xs text-slate-500 mt-0.5">${criterion.desc}</p>
-                            </div>
-                            <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-white border border-slate-200 text-science-700 self-start sm:self-center" id="score-label-${criterion.id}">
-                                Skor: ${score} / 5
-                            </span>
-                        </div>
-
-                        <!-- Rating Radio Options 1-5 -->
-                        <div class="flex items-center gap-2 sm:gap-4 pt-1">
-                            ${[1, 2, 3, 4, 5].map(val => `
-                                <label class="flex-1 text-center cursor-pointer">
-                                    <input type="radio" name="score_${criterion.id}" value="${val}" ${score === val ? 'checked' : ''} onchange="updateCriterionScore('${criterion.id}', ${val})" class="peer hidden">
-                                    <div class="py-2 px-1 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-600 peer-checked:bg-science-600 peer-checked:text-white peer-checked:border-science-600 peer-checked:shadow-sm transition hover:bg-slate-100">
-                                        ${val}
-                                    </div>
-                                    <span class="text-[10px] text-slate-400 block mt-1">${getRatingDescriptor(val)}</span>
-                                </label>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            updateLiveTabScore();
-        }
-
-        function getRatingDescriptor(val) {
-            const desc = { 1: 'Sangat Kurang', 2: 'Kurang', 3: 'Cukup', 4: 'Baik', 5: 'Sangat Baik' };
-            return desc[val] || '';
-        }
-
-        function updateCriterionScore(criterionId, scoreVal) {
-            const currentEval = appState.evaluations[appState.activePractice][appState.activeTab];
-            currentEval.scores[criterionId] = scoreVal;
-
-            document.getElementById(`score-label-${criterionId}`).innerText = `Skor: ${scoreVal} / 5`;
-
-            updateLiveTabScore();
-            updateAllSummaries();
-            saveToLocalStorage();
-        }
-
-        function saveCurrentFormState() {
-            const currentEval = appState.evaluations[appState.activePractice][appState.activeTab];
-            currentEval.notes = document.getElementById('eval-notes').value;
-            currentEval.peerName = document.getElementById('peer-evaluator-name').value;
-            saveToLocalStorage();
-        }
-
-        function resetCurrentTabForm() {
-            if (!confirm('Apakah Anda yakin ingin mengosongkan nilai form ini?')) return;
-            const currentEval = appState.evaluations[appState.activePractice][appState.activeTab];
-            RUBRIC_CRITERIA.forEach(c => currentEval.scores[c.id] = 0);
-            currentEval.notes = '';
-            currentEval.peerName = '';
-
-            renderRubricForm();
-            updateAllSummaries();
-            saveToLocalStorage();
-        }
-
-        function calculateAverageScore(scoresObj) {
-            const vals = Object.values(scoresObj || {});
-            if (!vals.length) return 0;
-            const sum = vals.reduce((a, b) => a + b, 0);
-            return (sum / RUBRIC_CRITERIA.length);
-        }
-
-        function getPredicate(score) {
-            if (score >= 4.5) return 'Sangat Baik (A)';
-            if (score >= 3.5) return 'Baik (B)';
-            if (score >= 2.5) return 'Cukup (C)';
-            if (score >= 1.5) return 'Kurang (D)';
-            if (score > 0) return 'Sangat Kurang (E)';
-            return 'Belum Dinilai';
-        }
-
-        function updateLiveTabScore() {
-            const currentEval = appState.evaluations[appState.activePractice][appState.activeTab];
-            const avg = calculateAverageScore(currentEval.scores);
-
-            document.getElementById('live-score-val').innerText = avg.toFixed(1);
-            document.getElementById('live-predikat-text').innerText = getPredicate(avg);
-        }
-
-        function updateAllSummaries() {
-            const currentPracticeData = appState.evaluations[appState.activePractice];
-
-            const selfAvg = calculateAverageScore(currentPracticeData.self.scores);
-            const peerAvg = calculateAverageScore(currentPracticeData.peer.scores);
-            const dosenAvg = calculateAverageScore(currentPracticeData.dosen.scores);
-
-            // Update Cards
-            document.getElementById('rekap-score-self').innerText = selfAvg.toFixed(2);
-            document.getElementById('rekap-predikat-self').innerText = getPredicate(selfAvg);
-            document.getElementById('bar-self').style.width = `${(selfAvg / 5) * 100}%`;
-
-            document.getElementById('rekap-score-peer').innerText = peerAvg.toFixed(2);
-            document.getElementById('rekap-predikat-peer').innerText = getPredicate(peerAvg);
-            document.getElementById('bar-peer').style.width = `${(peerAvg / 5) * 100}%`;
-
-            document.getElementById('rekap-score-dosen').innerText = dosenAvg.toFixed(2);
-            document.getElementById('rekap-predikat-dosen').innerText = getPredicate(dosenAvg);
-            document.getElementById('bar-dosen').style.width = `${(dosenAvg / 5) * 100}%`;
-
-            renderComparisonTable();
-            updateRadarChart();
-        }
-
-        function renderComparisonTable() {
-            const tbody = document.getElementById('comparison-table-body');
-            const p1Data = appState.evaluations.P1;
-            const p2Data = appState.evaluations.P2;
-
-            tbody.innerHTML = RUBRIC_CRITERIA.map(c => {
-                const p1s = p1Data.self.scores[c.id] || 0;
-                const p1p = p1Data.peer.scores[c.id] || 0;
-                const p1d = p1Data.dosen.scores[c.id] || 0;
-
-                const p2s = p2Data.self.scores[c.id] || 0;
-                const p2p = p2Data.peer.scores[c.id] || 0;
-                const p2d = p2Data.dosen.scores[c.id] || 0;
-
-                return `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="py-2.5 px-3 font-medium text-slate-800">${c.title}</td>
-                        <td class="py-2.5 px-2 text-center bg-blue-50/20">${p1s}</td>
-                        <td class="py-2.5 px-2 text-center bg-blue-50/20">${p1p}</td>
-                        <td class="py-2.5 px-2 text-center bg-blue-50/40 font-bold text-science-700">${p1d}</td>
-                        <td class="py-2.5 px-2 text-center bg-purple-50/20">${p2s}</td>
-                        <td class="py-2.5 px-2 text-center bg-purple-50/20">${p2p}</td>
-                        <td class="py-2.5 px-2 text-center bg-purple-50/40 font-bold text-purple-700">${p2d}</td>
-                    </tr>
-                `;
-            }).join('');
-
-            // Footer averages
-            document.getElementById('foot-p1-self').innerText = calculateAverageScore(p1Data.self.scores).toFixed(1);
-            document.getElementById('foot-p1-peer').innerText = calculateAverageScore(p1Data.peer.scores).toFixed(1);
-            document.getElementById('foot-p1-dosen').innerText = calculateAverageScore(p1Data.dosen.scores).toFixed(1);
-
-            document.getElementById('foot-p2-self').innerText = calculateAverageScore(p2Data.self.scores).toFixed(1);
-            document.getElementById('foot-p2-peer').innerText = calculateAverageScore(p2Data.peer.scores).toFixed(1);
-            document.getElementById('foot-p2-dosen').innerText = calculateAverageScore(p2Data.dosen.scores).toFixed(1);
-        }
-
-        function initRadarChart() {
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            
-            radarChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: getRadarData(),
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: { color: '#e2e8f0' },
-                            grid: { color: '#f1f5f9' },
-                            pointLabels: {
-                                font: { size: 9, family: 'Inter' },
-                                color: '#475569'
-                            },
-                            suggestedMin: 0,
-                            suggestedMax: 5,
-                            ticks: { stepSize: 1, display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { boxWidth: 10, font: { size: 10, family: 'Inter' } }
-                        }
-                    }
-                }
-            });
-        }
-
-        function getRadarData() {
-            const currentEval = appState.evaluations[appState.activePractice];
-            const labels = ['Apersepsi', 'Penguasaan Materi', 'Media/KIT', 'Pengelolaan Kelas', 'Penutup'];
-
-            const selfScores = RUBRIC_CRITERIA.map(c => currentEval.self.scores[c.id] || 0);
-            const peerScores = RUBRIC_CRITERIA.map(c => currentEval.peer.scores[c.id] || 0);
-            const dosenScores = RUBRIC_CRITERIA.map(c => currentEval.dosen.scores[c.id] || 0);
-
-            return {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Diri (Self)',
-                        data: selfScores,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.15)',
-                        borderWidth: 1.5
-                    },
-                    {
-                        label: 'Teman (Peer)',
-                        data: peerScores,
-                        borderColor: '#059669',
-                        backgroundColor: 'rgba(5, 150, 105, 0.15)',
-                        borderWidth: 1.5
-                    },
-                    {
-                        label: 'Dosen',
-                        data: dosenScores,
-                        borderColor: '#9333ea',
-                        backgroundColor: 'rgba(147, 51, 234, 0.2)',
-                        borderWidth: 2
-                    }
-                ]
-            };
-        }
-
-        function updateRadarChart() {
-            if (radarChartInstance) {
-                radarChartInstance.data = getRadarData();
-                radarChartInstance.update();
+</body>
+</html>
