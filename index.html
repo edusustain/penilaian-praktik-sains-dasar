@@ -15,424 +15,281 @@
     <header class="bg-indigo-700 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 py-6">
             <h1 class="text-2xl font-bold">Aplikasi Penilaian Praktik Pengajaran Sains Dasar</h1>
-            <p class="text-indigo-200 text-sm mt-1">Evaluasi 360-Derajat: Penilaian Diri, Teman Sejawat, dan Dosen</p>
+            <p class="text-indigo-200 text-sm mt-1">Sistem Evaluasi Terintegrasi Google Sheets (Self, Peer & Dosen)</p>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 mt-6 space-y-6">
 
-        <!-- Top Controls: Sesi Praktik & Cetak -->
-        <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-md gap-4">
+        <!-- Controls: Sesi Praktik & Pilihan Peran Penilai -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-xl shadow-md border border-slate-100">
             <!-- Navigasi Sesi Praktik -->
-            <div class="flex space-x-2 bg-slate-100 p-1.5 rounded-lg border border-slate-200">
-                <button id="btn-praktik1" onclick="setSession('praktik1')" class="px-5 py-2 text-sm font-semibold rounded-md transition-all bg-indigo-600 text-white shadow">
-                    Praktik 1
-                </button>
-                <button id="btn-praktik2" onclick="setSession('praktik2')" class="px-5 py-2 text-sm font-semibold rounded-md transition-all text-slate-600 hover:text-indigo-600">
-                    Praktik 2
-                </button>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Sesi Praktik Pengajaran</label>
+                <div class="flex space-x-2 bg-slate-100 p-1.5 rounded-lg border border-slate-200">
+                    <button id="btn-praktik1" onclick="setSession('Praktik 1')" class="flex-1 py-2 text-sm font-semibold rounded-md transition-all bg-indigo-600 text-white shadow">
+                        Praktik 1
+                    </button>
+                    <button id="btn-praktik2" onclick="setSession('Praktik 2')" class="flex-1 py-2 text-sm font-semibold rounded-md transition-all text-slate-600 hover:text-indigo-600">
+                        Praktik 2
+                    </button>
+                </div>
             </div>
 
-            <!-- Tombol Cetak / PDF -->
-            <button onclick="window.print()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg text-sm flex items-center justify-center gap-2 transition-all shadow">
-                <span>🖨️</span> Cetak Laporan / PDF
-            </button>
+            <!-- Peran Penilai -->
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Peran Anda Sebagai Penilai</label>
+                <select id="select-role" onchange="setRole(this.value)" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500">
+                    <option value="Self">1. Penilaian Diri (Mahasiswa Praktikan)</option>
+                    <option value="Peer">2. Teman Sejawat (Penilai Pengamat)</option>
+                    <option value="Lecturer">3. Dosen Pembimbing / Penguji</option>
+                </select>
+            </div>
         </div>
 
         <!-- Section 1: Identitas Mahasiswa & Bahan Ajar -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Data Mahasiswa -->
+            <!-- Data Mahasiswa yang Dinilai -->
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border border-slate-100">
                 <h2 class="text-lg font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2">
-                    <span>👤</span> Identitas Mahasiswa Praktikan
+                    <span>👤</span> Identitas Mahasiswa Praktikan (Yang Dinilai)
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Mahasiswa</label>
-                        <input type="text" id="input-nama" onchange="saveData()" placeholder="Nama Mahasiswa..." class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Mahasiswa <span class="text-red-500">*</span></label>
+                        <input type="text" id="input-nama" placeholder="Contoh: Ahmad Dahlan" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">NIM</label>
-                        <input type="text" id="input-nim" onchange="saveData()" placeholder="NIM..." class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">NIM <span class="text-red-500">*</span></label>
+                        <input type="text" id="input-nim" placeholder="Contoh: 202401001" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Topik / Materi Pembelajaran Sains</label>
-                        <input type="text" id="input-topik" onchange="saveData()" placeholder="Contoh: Photosynthesis & Transport pada Tumbuhan" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="input-topik" placeholder="Contoh: Perubahan Wujud Benda & Sains Dasar" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div id="field-penilai-name" class="sm:col-span-2 hidden">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Anda (Sebagai Penilai Sejawat / Dosen)</label>
+                        <input type="text" id="input-penilai-nama" placeholder="Nama Penilai..." class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
             </div>
 
-            <!-- Upload Media / Bahan Ajar -->
+            <!-- Media / Bahan Ajar -->
             <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
                 <h2 class="text-lg font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2">
-                    <span>📁</span> Media & Bahan Ajar
+                    <span>📁</span> Bahan Ajar & Video
                 </h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Upload Modul / PPT / RPP</label>
-                        <input type="file" id="input-file" onchange="handleFileUpload(event)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                        <p id="file-info" class="text-xs text-emerald-600 font-medium mt-1"></p>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Link File Bahan Ajar (Google Drive / Canva)</label>
+                        <input type="url" id="input-file-link" placeholder="https://drive.google.com/..." class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Link Video Praktik (YouTube/Drive)</label>
-                        <input type="url" id="input-video-link" onchange="saveData()" placeholder="https://..." class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Link Video Rekaman Praktik (YouTube/Drive)</label>
+                        <input type="url" id="input-video-link" placeholder="https://youtube.com/..." class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section 2: Tab Penilaian (3-Perspektif) & Rekapitulasi -->
-        <div class="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden">
-            <!-- Tab Navigasi Penilaian -->
-            <div class="flex flex-wrap border-b bg-slate-50">
-                <button id="tab-self" onclick="switchTab('self')" class="px-6 py-3 font-medium text-sm border-b-2 border-indigo-600 text-indigo-600 bg-white">
-                    1. Penilaian Diri (Self)
-                </button>
-                <button id="tab-peer" onclick="switchTab('peer')" class="px-6 py-3 font-medium text-sm border-b-2 border-transparent text-slate-500 hover:text-indigo-600">
-                    2. Teman Sejawat (Peer)
-                </button>
-                <button id="tab-lecturer" onclick="switchTab('lecturer')" class="px-6 py-3 font-medium text-sm border-b-2 border-transparent text-slate-500 hover:text-indigo-600">
-                    3. Penilaian Dosen
-                </button>
-                <button id="tab-recap" onclick="switchTab('recap')" class="px-6 py-3 font-medium text-sm border-b-2 border-transparent text-slate-500 hover:text-indigo-600 font-semibold text-emerald-700">
-                    4. Rekapitulasi & Grafik
-                </button>
+        <!-- Section 2: Form Rubrik Penilaian -->
+        <div class="bg-white rounded-xl shadow-md border border-slate-100 p-6">
+            <h2 class="text-lg font-bold text-slate-800 border-b pb-3 mb-4 flex justify-between items-center">
+                <span>📋 Rubrik Penilaian Sains</span>
+                <span id="role-badge" class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold">Mode: Penilaian Diri</span>
+            </h2>
+
+            <div class="mb-4 bg-amber-50 p-3 rounded-lg border border-amber-200 text-xs text-amber-800">
+                <strong>Petunjuk Skor:</strong> 1 = Kurang | 2 = Cukup | 3 = Baik | 4 = Sangat Baik
             </div>
 
-            <!-- Konten Form Penilaian (Self / Peer / Lecturer) -->
-            <div id="panel-form" class="p-6">
-                <div class="mb-4 bg-indigo-50 p-3 rounded-lg border border-indigo-100 text-xs text-indigo-800">
-                    <strong>Petunjuk Skala Nilai:</strong> 1 = Kurang | 2 = Cukup | 3 = Baik | 4 = Sangat Baik
-                </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 border-b text-slate-700">
+                            <th class="p-3 w-12 text-center">No</th>
+                            <th class="p-3">Indikator Praktik Pengajaran Sains</th>
+                            <th class="p-3 text-center w-48">Skor (1 - 4)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rubrik-body">
+                        <!-- Diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-100 border-b text-slate-700">
-                                <th class="p-3 w-12 text-center">No</th>
-                                <th class="p-3">Indikator Praktik Pengajaran Sains</th>
-                                <th class="p-3 text-center w-48">Skor (1 - 4)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="rubrik-body">
-                            <!-- Diisi secara dinamis oleh JavaScript -->
-                        </tbody>
-                    </table>
+            <!-- Catatan Umpan Balik -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kelebihan Pengajaran</label>
+                    <textarea id="note-kelebihan" rows="3" class="w-full p-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tuliskan aspek positif..."></textarea>
                 </div>
-
-                <!-- Catatan Umpan Balik -->
-                <div class="mt-6">
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Catatan Kelebihan & Masukan Pengembangan</label>
-                    <textarea id="catatan-text" onchange="saveData()" rows="3" class="w-full p-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tuliskan umpan balik konstruktif di sini..."></textarea>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Saran & Area Pengembangan</label>
+                    <textarea id="note-pengembangan" rows="3" class="w-full p-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tuliskan saran perbaikan..."></textarea>
                 </div>
             </div>
 
-            <!-- Panel Rekapitulasi & Grafik (Disembunyikan secara default) -->
-            <div id="panel-recap" class="p-6 hidden space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                    <!-- Canvas Grafik Radar -->
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-center">
-                        <h3 class="text-sm font-bold text-slate-700 mb-2">Grafik Perbandingan Persepsi (Radar)</h3>
-                        <div class="w-full max-w-xs sm:max-w-md">
-                            <canvas id="radarChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Ringkasan Skor -->
-                    <div class="space-y-4">
-                        <h3 class="text-lg font-bold text-slate-800 border-b pb-2">Ringkasan Nilai Praktik</h3>
-                        
-                        <div class="grid grid-cols-3 gap-3 text-center">
-                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                                <div class="text-xs font-semibold text-blue-600">Diri (Self)</div>
-                                <div id="score-self" class="text-xl font-extrabold text-blue-800 mt-1">0.00</div>
-                            </div>
-                            <div class="bg-amber-50 p-3 rounded-lg border border-amber-100">
-                                <div class="text-xs font-semibold text-amber-600">Teman (Peer)</div>
-                                <div id="score-peer" class="text-xl font-extrabold text-amber-800 mt-1">0.00</div>
-                            </div>
-                            <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
-                                <div class="text-xs font-semibold text-indigo-600">Dosen</div>
-                                <div id="score-lecturer" class="text-xl font-extrabold text-indigo-800 mt-1">0.00</div>
-                            </div>
-                        </div>
-
-                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 text-center">
-                            <div class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Nilai Akhir (Skor Dosen 60% + Peer 20% + Self 20%)</div>
-                            <div id="final-score" class="text-3xl font-black text-emerald-800 my-1">0.00</div>
-                            <div id="final-grade" class="inline-block px-3 py-1 bg-emerald-600 text-white font-bold rounded-full text-xs">Predikat: -</div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Tombol Kirim Data ke Google Sheets -->
+            <div class="mt-6 flex justify-end">
+                <button id="btn-submit" onclick="submitData()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl text-sm transition-all shadow-lg flex items-center justify-center gap-2">
+                    <span>🚀</span> Kirim Penilaian ke Google Sheets
+                </button>
             </div>
-
+            
+            <p id="status-message" class="text-center text-sm font-semibold mt-3 hidden"></p>
         </div>
+
     </main>
 
-    <!-- LOGIKA JAVASCRIPT LENGKAP -->
     <script>
-        // Indikator Rubrik Sains
+        // === TEMPAT MASUKKAN URL APPS SCRIPT ANDA ===
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxG0WSD4F_1trg9bEULNlJKOjw2tHW0E5vjeaWY-GXq8KJNFB6W5Lu7IS_8QYM8rJef/exec";
+
         const rubrikData = [
             "Apersepsi & Penjelasan Konsep Dasar Sains",
             "Penerapan Metode Ilmiah / Scientific Approach",
-            "Penggunaan Alat Peraga & Media Sains",
-            "Manajemen Kelas & Pengelolaan Waktu Praktikum",
+            "Penggunaan Alat Peraga & Media Pembelajaran Sains",
+            "Manajemen Kelas & Pengelolaan Waktu Praktik",
             "Keterampilan Bertanya & Membimbing Diskusi",
-            "Penguasaan Pengoperasian Laboratorium / Keamanan Kerja",
             "Evaluasi & Umpan Balik Ketercapaian Pembelajaran Sains"
         ];
 
-        // State Aplikasi
-        let currentSession = 'praktik1'; // 'praktik1' | 'praktik2'
-        let currentTab = 'self';         // 'self' | 'peer' | 'lecturer' | 'recap'
-        let chartInstance = null;
+        let currentSession = 'Praktik 1';
+        let currentRole = 'Self';
+        let scores = [0, 0, 0, 0, 0, 0];
 
-        // Struktur Data
-        let appData = {
-            praktik1: createEmptyData(),
-            praktik2: createEmptyData()
-        };
-
-        function createEmptyData() {
-            return {
-                nama: '',
-                nim: '',
-                topik: '',
-                fileName: '',
-                videoLink: '',
-                scores: {
-                    self: [0, 0, 0, 0, 0, 0, 0],
-                    peer: [0, 0, 0, 0, 0, 0, 0],
-                    lecturer: [0, 0, 0, 0, 0, 0, 0]
-                },
-                notes: { self: '', peer: '', lecturer: '' }
-            };
-        }
-
-        // Inisialisasi Aplikasi saat Load
         window.onload = function() {
-            loadFromLocalStorage();
             renderForm();
-            updateUI();
         };
 
-        // Ganti Sesi Praktik 1 / Praktik 2
         function setSession(session) {
             currentSession = session;
+            document.getElementById('btn-praktik1').className = session === 'Praktik 1'
+                ? 'flex-1 py-2 text-sm font-semibold rounded-md transition-all bg-indigo-600 text-white shadow'
+                : 'flex-1 py-2 text-sm font-semibold rounded-md transition-all text-slate-600 hover:text-indigo-600';
             
-            // Toggle warna tombol
-            document.getElementById('btn-praktik1').className = session === 'praktik1'
-                ? 'px-5 py-2 text-sm font-semibold rounded-md transition-all bg-indigo-600 text-white shadow'
-                : 'px-5 py-2 text-sm font-semibold rounded-md transition-all text-slate-600 hover:text-indigo-600';
-            
-            document.getElementById('btn-praktik2').className = session === 'praktik2'
-                ? 'px-5 py-2 text-sm font-semibold rounded-md transition-all bg-indigo-600 text-white shadow'
-                : 'px-5 py-2 text-sm font-semibold rounded-md transition-all text-slate-600 hover:text-indigo-600';
-
-            updateUI();
-            if (currentTab === 'recap') updateRecap();
+            document.getElementById('btn-praktik2').className = session === 'Praktik 2'
+                ? 'flex-1 py-2 text-sm font-semibold rounded-md transition-all bg-indigo-600 text-white shadow'
+                : 'flex-1 py-2 text-sm font-semibold rounded-md transition-all text-slate-600 hover:text-indigo-600';
         }
 
-        // Ganti Tab Penilaian
-        function switchTab(tab) {
-            currentTab = tab;
-            const tabs = ['self', 'peer', 'lecturer', 'recap'];
+        function setRole(role) {
+            currentRole = role;
+            const badge = document.getElementById('role-badge');
+            const penilaiField = document.getElementById('field-penilai-name');
 
-            tabs.forEach(t => {
-                const btn = document.getElementById(`tab-${t}`);
-                if (t === tab) {
-                    btn.className = "px-6 py-3 font-medium text-sm border-b-2 border-indigo-600 text-indigo-600 bg-white font-semibold";
-                } else {
-                    btn.className = "px-6 py-3 font-medium text-sm border-b-2 border-transparent text-slate-500 hover:text-indigo-600";
-                }
-            });
-
-            if (tab === 'recap') {
-                document.getElementById('panel-form').classList.add('hidden');
-                document.getElementById('panel-recap').classList.remove('hidden');
-                updateRecap();
+            if (role === 'Self') {
+                badge.innerText = 'Mode: Penilaian Diri';
+                badge.className = 'text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold';
+                penilaiField.classList.add('hidden');
+            } else if (role === 'Peer') {
+                badge.innerText = 'Mode: Penilaian Teman Sejawat';
+                badge.className = 'text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-bold';
+                penilaiField.classList.remove('hidden');
             } else {
-                document.getElementById('panel-form').classList.remove('hidden');
-                document.getElementById('panel-recap').classList.add('hidden');
-                renderForm();
+                badge.innerText = 'Mode: Penilaian Dosen';
+                badge.className = 'text-xs bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold';
+                penilaiField.classList.remove('hidden');
             }
         }
 
-        // Render Tabel Form Rubrik
         function renderForm() {
             const tbody = document.getElementById('rubrik-body');
             tbody.innerHTML = '';
-
-            const currentScores = appData[currentSession].scores[currentTab];
 
             rubrikData.forEach((indikator, index) => {
                 const row = document.createElement('tr');
                 row.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
 
-                let optionsHTML = '<option value="0">-- Pilih --</option>';
-                [1, 2, 3, 4].forEach(val => {
-                    const selected = currentScores[index] === val ? 'selected' : '';
-                    optionsHTML += `<option value="${val}" ${selected}>${val}</option>`;
-                });
-
                 row.innerHTML = `
                     <td class="p-3 text-center font-medium text-slate-500">${index + 1}</td>
                     <td class="p-3 font-medium text-slate-800">${indikator}</td>
                     <td class="p-3 text-center">
-                        <select onchange="updateScore(${index}, this.value)" class="w-full px-2 py-1.5 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
-                            ${optionsHTML}
+                        <select onchange="scores[${index}] = parseInt(this.value)" class="w-full px-2 py-1.5 border rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                            <option value="0">-- Pilih --</option>
+                            <option value="1">1 - Kurang</option>
+                            <option value="2">2 - Cukup</option>
+                            <option value="3">3 - Baik</option>
+                            <option value="4">4 - Sangat Baik</option>
                         </select>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
-
-            // Set Catatan
-            document.getElementById('catatan-text').value = appData[currentSession].notes[currentTab] || '';
         }
 
-        // Update Skor Per Indikator
-        function updateScore(index, val) {
-            appData[currentSession].scores[currentTab][index] = parseInt(val) || 0;
-            saveData();
-        }
+        async function submitData() {
+            const nama = document.getElementById('input-nama').value.trim();
+            const nim = document.getElementById('input-nim').value.trim();
+            const statusMsg = document.getElementById('status-message');
+            const btnSubmit = document.getElementById('btn-submit');
 
-        // Simpan Data Identitas
-        function saveData() {
-            const data = appData[currentSession];
-            data.nama = document.getElementById('input-nama').value;
-            data.nim = document.getElementById('input-nim').value;
-            data.topik = document.getElementById('input-topik').value;
-            data.videoLink = document.getElementById('input-video-link').value;
-            
-            if (currentTab !== 'recap') {
-                data.notes[currentTab] = document.getElementById('catatan-text').value;
+            if (!nama || !nim) {
+                alert("Harap isi Nama dan NIM Mahasiswa yang dinilai!");
+                return;
             }
 
-            saveToLocalStorage();
-        }
-
-        // Handle File Upload Simpel
-        function handleFileUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                appData[currentSession].fileName = file.name;
-                document.getElementById('file-info').innerText = "✓ Tersimpan: " + file.name;
-                saveData();
-            }
-        }
-
-        // Update Seluruh Tampilan UI dengan Data Terbaru
-        function updateUI() {
-            const data = appData[currentSession];
-            document.getElementById('input-nama').value = data.nama || '';
-            document.getElementById('input-nim').value = data.nim || '';
-            document.getElementById('input-topik').value = data.topik || '';
-            document.getElementById('input-video-link').value = data.videoLink || '';
-            document.getElementById('file-info').innerText = data.fileName ? "✓ Tersimpan: " + data.fileName : '';
-
-            if (currentTab !== 'recap') {
-                renderForm();
-            }
-        }
-
-        // Hitung Rata-Rata Skor
-        function getAverage(arr) {
-            const sum = arr.reduce((a, b) => a + b, 0);
-            return arr.length ? (sum / arr.length) : 0;
-        }
-
-        // Hitung Rekapitulasi & Render Grafik
-        function updateRecap() {
-            const scores = appData[currentSession].scores;
-            
-            const avgSelf = getAverage(scores.self);
-            const avgPeer = getAverage(scores.peer);
-            const avgLecturer = getAverage(scores.lecturer);
-
-            document.getElementById('score-self').innerText = avgSelf.toFixed(2);
-            document.getElementById('score-peer').innerText = avgPeer.toFixed(2);
-            document.getElementById('score-lecturer').innerText = avgLecturer.toFixed(2);
-
-            // Pembobotan: Dosen 60%, Peer 20%, Self 20%
-            const finalScore = (avgLecturer * 0.6) + (avgPeer * 0.2) + (avgSelf * 0.2);
-            document.getElementById('final-score').innerText = finalScore.toFixed(2);
-
-            // Predikat
-            let grade = 'E';
-            if (finalScore >= 3.5) grade = 'A (Sangat Baik)';
-            else if (finalScore >= 3.0) grade = 'B (Baik)';
-            else if (finalScore >= 2.0) grade = 'C (Cukup)';
-            else if (finalScore >= 1.0) grade = 'D (Kurang)';
-            
-            document.getElementById('final-grade').innerText = 'Predikat: ' + grade;
-
-            // Render Chart.js
-            renderRadarChart(scores.self, scores.peer, scores.lecturer);
-        }
-
-        // Render / Refresh Radar Chart
-        function renderRadarChart(self, peer, lecturer) {
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            
-            if (chartInstance) {
-                chartInstance.destroy();
+            if (scores.includes(0)) {
+                alert("Harap lengkapi semua indikator penilaian sebelum mengirim!");
+                return;
             }
 
-            chartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: rubrikData.map((_, i) => `Indikator ${i+1}`),
-                    datasets: [
-                        {
-                            label: 'Diri (Self)',
-                            data: self,
-                            borderColor: 'rgba(59, 130, 246, 1)',
-                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                        },
-                        {
-                            label: 'Teman (Peer)',
-                            data: peer,
-                            borderColor: 'rgba(245, 158, 11, 1)',
-                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                        },
-                        {
-                            label: 'Dosen',
-                            data: lecturer,
-                            borderColor: 'rgba(79, 70, 229, 1)',
-                            backgroundColor: 'rgba(79, 70, 229, 0.2)',
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        r: {
-                            min: 0,
-                            max: 4,
-                            ticks: { stepSize: 1 }
-                        }
-                    }
-                }
-            });
-        }
+            if (SCRIPT_URL === "URL_GOOGLE_APPS_SCRIPT_ANDA_DI_SINI") {
+                alert("Anda belum mengganti SCRIPT_URL dengan link Apps Script Anda!");
+                return;
+            }
 
-        // Penyimpanan di LocalStorage Browser
-        function saveToLocalStorage() {
-            localStorage.setItem('sains_penilaian_data', JSON.stringify(appData));
-        }
+            // Hitung rata-rata
+            const sum = scores.reduce((a, b) => a + b, 0);
+            const avg = (sum / scores.length).toFixed(2);
 
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('sains_penilaian_data');
-            if (saved) {
-                try {
-                    appData = JSON.parse(saved);
-                } catch (e) {
-                    console.error("Gagal memuat data tersimpan", e);
-                }
+            const payload = {
+                session: currentSession,
+                role: currentRole,
+                nama: nama,
+                nim: nim,
+                topik: document.getElementById('input-topik').value.trim(),
+                penilaiName: document.getElementById('input-penilai-nama').value.trim(),
+                fileLink: document.getElementById('input-file-link').value.trim(),
+                videoLink: document.getElementById('input-video-link').value.trim(),
+                scores: scores,
+                averageScore: avg,
+                noteKelebihan: document.getElementById('note-kelebihan').value.trim(),
+                notePengembangan: document.getElementById('note-pengembangan').value.trim()
+            };
+
+            // Loading state
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "⏳ Memproses & Mengirim Data...";
+            statusMsg.classList.remove('hidden');
+            statusMsg.className = "text-center text-sm font-semibold mt-3 text-indigo-600";
+            statusMsg.innerText = "Mengirim data penilaian ke Google Sheets...";
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Mencegah isu CORS pada Google Apps Script
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                statusMsg.className = "text-center text-sm font-semibold mt-3 text-emerald-600";
+                statusMsg.innerText = "✅ Penilaian Berhasil Terkirim & Tersimpan di Google Sheets!";
+                
+                // Reset form sebagian
+                setTimeout(() => {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = "<span>🚀</span> Kirim Penilaian Lainnya";
+                }, 2000);
+
+            } catch (error) {
+                statusMsg.className = "text-center text-sm font-semibold mt-3 text-red-600";
+                statusMsg.innerText = "❌ Gagal mengirim data. Periksa koneksi internet Anda.";
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "Coba Kirim Lagi";
             }
         }
     </script>
-
 </body>
 </html>
